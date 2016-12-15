@@ -1,0 +1,4 @@
+---
+uwsgi_conf: null
+uwsgi_plugins: []
+uwsgi_user: null

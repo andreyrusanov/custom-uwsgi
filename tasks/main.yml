@@ -1,0 +1,24 @@
+---
+- fail: msg="uwsgi_user and uwsgi_conf should be defined"
+  when: not uwsgi_conf or not uwsgi_user
+
+- name: Create uwsgi user if not exist
+  user: name={{ uwsgi_user }}
+
+- name: install uwsgi
+  yum: name=uwsgi
+
+- name: install uwsgi plugins
+  yum: name={{ item }}
+  with_items: uwsgi_plugins
+
+- name: create uWSGI service
+  template: src=templates/uwsgi.service.j2 dest=/etc/systemd/system/uwsgi.service
+  register: uwsgi_service_file
+
+- name: restart systemctl
+  shell: systemctl daemon-reload
+  when: uwsgi_service_file.changed
+
+- name: verify services started
+  service: name=uwsgi state=started
